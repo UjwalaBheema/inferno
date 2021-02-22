@@ -340,26 +340,40 @@ namespace :inferno do |_argv|
     File.open('script.json', 'w') { |file| file.write(JSON.pretty_generate(output)) }
   end
 
+# bundle exec rake inferno:execute['http://localhost:3000/r4/2c400054-42d8-4e74-87b7-80b5bd5fde9f/','uscore_v3.1.1','USCore311CareteamSequence']
   desc 'Execute sequences against a FHIR server'
-  task :execute, [:server, :module] do |_task, args|
+  task :execute, [:server, :module, :sequence_name] do |_task, args|
     Inferno::StartupTasks.run
 
     FHIR.logger.level = Logger::UNKNOWN
     sequences = []
-    requires = []
+    requires = [:patient_id]
     defines = []
 
     instance = Inferno::TestingInstance.new(url: args[:server], selected_module: args[:module])
     instance.save!
+    input_seq_name = args[:sequence_name]
 
     instance.module.sequences.each do |seq|
-      next unless args.extras.empty? || args.extras.include?(seq.sequence_name.split('Sequence')[0])
+    # seq = Inferno::Sequence::USCore311CareteamSequence
+      loop_seq_name = seq.sequence_name
+      seq_name = loop_seq_name.split('Sequence')[0]
 
-      seq.requires.each do |req|
-        requires << req unless requires.include?(req) || defines.include?(req) || req == :url
+      next unless args.extras.empty? || args.extras.include?(seq.sequence_name.split('Sequence')[0])
+      p '------------------input_seq_name-------------'
+      p "------------------#{input_seq_name}-------------"
+      
+
+      p '------------------loop_seq_name-------------'
+      p "------------------#{loop_seq_name}-------------"
+      if (input_seq_name.blank? && seq_name.upcase.include?('USCORE')) || input_seq_name == loop_seq_name
+       p "success in if loop-#{input_seq_name}=#{input_seq_name}-   -loop_seq_name = #{loop_seq_name}-------------"
+        seq.requires.each do |req|
+          requires << req unless requires.include?(req) || defines.include?(req) || req == :url
+        end
       end
       defines.push(*seq.defines)
-      sequences << seq
+      sequences << seq if (input_seq_name.blank? && seq_name.upcase.include?('USCORE')) || input_seq_name == loop_seq_name
     end
 
     o = OptionParser.new
@@ -402,13 +416,13 @@ namespace :inferno do |_argv|
       args_list = "#{instance.url},#{args.module}"
       args_list += ",#{args.extras.join(',')}" unless args.extras.empty?
 
-      puts ''
-      puts "\nIn the future, run with the following command:\n\n"
-      puts "  rake inferno:execute[#{args_list}] -- #{param_list}".light_black
-      puts ''
-      print '(enter to continue)'.red
-      STDIN.getc
-      print "            \r"
+      # puts ''
+      # puts "\nIn the future, run with the following command:\n\n"
+      # puts "  rake inferno:execute[#{args_list}] -- #{param_list}".light_black
+      # puts ''
+      # print '(enter to continue)'.red
+      # STDIN.getc
+      # print "            \r"
     end
 
     exit execute(instance, sequences.map { |s| { 'sequence' => s } })
