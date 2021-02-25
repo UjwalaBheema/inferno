@@ -49,6 +49,7 @@ modules:
   - bdt
   - ips
   - uscore_v3.1.1
+  - cerner_uscore_v3.1.1
   
 # FHIRPath evaluator options: must be one of "internal" or "external".
 # external_fhirpath_evaluator_url is only used if fhirpath_evaluator is set to
@@ -145,3 +146,12 @@ presets:
     confidential_client: true
     client_secret: SAMPLE_CONFIDENTIAL_CLIENT_SECRET
     patient_ids: "85,355"
+  localhost_cerner_reference_server:
+    inferno_uri: http://localhost:4567
+    name: Cerner Inferno Reference Server (USCore v3.1.1)
+    uri: https://inferno.healthit.gov/reference-server/r4
+    module: cerner_uscore_v3.1.1
+    client_id: SAMPLE_CONFIDENTIAL_CLIENT_ID
+    confidential_client: true
+    client_secret: SAMPLE_CONFIDENTIAL_CLIENT_SECRET
+    patient_ids: "851212212111,35512121212121"    
