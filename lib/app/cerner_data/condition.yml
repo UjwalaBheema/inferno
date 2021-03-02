@@ -1,0 +1,108 @@
+resource: Condition
+name: 'cerner_us_core_condition'
+class_name: 'USCore311CernerCareteamSequence'
+version: 'v3.1.1'
+reformatted_version: '311'
+test_id_prefix: 'USCCPL'
+profile: 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-careteam'
+profile_name: 'Cerner US Core CareTeam Profile'
+title: 'CareTeam'
+id_definitions:
+  - key: charted_problem_condition
+    pattern: p(?<id>:millennium_id)
+  - key: staged_problem_condition
+    pattern: S-p(?<id>:millennium_id)
+  - key: charted_diagnosis_condition
+    pattern: d(?<id>:millennium_id)
+  - key: health_concern_v1
+    pattern: (?<id>:uuid)
+
+actions:
+  read:
+    parameters:
+      id:
+        type: id_token
+        occurrence: single
+        id_value_type: id_definition
+        id_value_type_id_def_patterns:
+          - charted_diagnosis_condition
+          - charted_problem_condition
+          - staged_problem_condition
+          - health_concern_v1
+  search:
+    parameters:
+      ids:
+        type: id_token
+        display: '_id'
+        occurrence: unbounded
+        id_value_type: id_definition
+        id_value_type_id_def_patterns:
+          - charted_problem_condition
+          - staged_problem_condition
+          - charted_diagnosis_condition
+          - health_concern_v1
+
+      categories:
+        type: token
+        display: 'category'
+        occurrence: unbounded
+
+      clinical_statuses:
+        type: token
+        display: 'clinical-status'
+        occurrence: unbounded
+
+      patient:
+        type: reference
+        display: 'patient'
+        resource_type: 'Patient'
+        reference_value_type: millennium
+
+      subject:
+        type: reference
+        display: 'subject'
+        resource_type: 'Patient'
+        resource_type_required: true
+        reference_value_type: millennium
+        modifiers: 'Patient'
+
+      page_context:
+        type: string
+        display: '-pageContext'
+
+      page_direction:
+        type: string
+        display: '-pageDirection'
+
+      count:
+        type: number
+        display: '_count'
+        bounds: greater_than_zero
+
+    constraints:
+      - type: parameter_group
+        name: retrieve_by_ids
+        parameters: [ids]
+
+      - type: parameter_group
+        name: search_by_parameters
+        parameters: [patient, subject, categories, clinical_statuses, count]
+
+      - type: parameter_group
+        name: paging_parameters
+        parameters: [page_context, page_direction]
+
+      - type: groups_cannot_be_set_together
+        groups: [retrieve_by_ids, search_by_parameters]
+
+      - type: groups_cannot_be_set_together
+        groups: [retrieve_by_ids, paging_parameters]
+
+      - type: must_be_set_together
+        parameters: [page_context, page_direction]
+
+      - type: cannot_be_set_together
+        parameters: [patient, subject, ids]
+
+      - type: at_least_one_must_be_set
+        parameters: [patient, subject, ids]

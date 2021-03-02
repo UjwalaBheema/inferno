@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require_relative './generic_generator_utilities'
+require_relative '../generator/cerner_utils/constraint'
+require_relative '../lib/app/utils/cerner_utils/constraint'
+require_relative '../lib/app/utils/cerner_utils/utility'
 
 module Inferno
   module Generator
@@ -21,7 +24,10 @@ module Inferno
                   :url,
                   :searches,
                   :must_supports,
-                  :interactions
+                  :interactions,
+                  :happy_path,
+                  :unsupported_format,
+                  :unhappy_path,
 
       def initialize(profile, module_name, all_search_parameter_metadata, capability_statement = nil)
         @profile = profile

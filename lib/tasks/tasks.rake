@@ -13,6 +13,8 @@ require_relative '../app/endpoint'
 require_relative '../app/helpers/configuration'
 require_relative '../app/sequence_base'
 require_relative '../app/models'
+require_relative '../app/utils/cerner_utils/constraint'
+require_relative '../app/utils/cerner_utils/utility'
 
 include Inferno
 
@@ -885,6 +887,50 @@ namespace :terminology do |_argv|
 
     puts "#{symbol} #{code_display} #{in_system} #{system_checked}"
   end
+end
+
+
+namespace :cerner_specific_task do
+  # bundle exec rake cerner_specific_task:in_generate
+  task :generator do |_t, args|
+
+    # utility = Utility.new
+
+    Dir.glob("#{resource_file_path}/cerner_uscore_v3.1.1/*.*") do |resource| # note one extra "*"
+      if File.file?(resource) && resource.end_with?('yml', 'xml')
+
+      end
+    end
+    # Dir.entries("..//folder").select { |f| File.file? File.join("your/folder", f) }
+
+    # ('../resources/cerner_uscore_v3.1.1')
+    utility.parse_capability('./datas/goal.yml')
+    utility.build_combinations
+    utility.process_occurrences
+    utility.date_range
+    utility.acceptheader_formats
+    utility.generate_testcases
+  end
+
+
+  task :in_generate, [:generator, :path, :add_to_config] do |_t, args|
+    args.with_defaults(add_to_config: 'true')
+    require_relative("../../generator/uscore/#{args.generator}_generator")
+
+    generator_class = Inferno::Generator::Base.subclasses.first do |c|
+      c.name.demodulize.downcase.start_with?(args.generator)
+    end
+
+    generator = generator_class.new(args.path, args.extras)
+    generator.run
+    if args.add_to_config == 'true'
+      ConfigManager.new('config.yml').tap do |cm|
+        cm.add_modules(args.path)
+        cm.write_to_file('config.yml')
+      end
+    end
+  end
+
 end
 
 RuboCop::RakeTask.new(:rubocop) do |t|

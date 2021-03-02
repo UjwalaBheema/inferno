@@ -17,7 +17,7 @@ test_sets:
       - name: Cerner US Core v3.1.1 Profiles
         run_all: true
         sequences:
-          - USCore311CernerCareplanSequence
+          - USCore311CernerGoalSequence
 sequence_requirements:
   device_codes:
     label: 'Implantable Device Type Codes'

@@ -1,0 +1,52 @@
+# frozen_string_literal: true
+
+require_relative './data_absent_reason_checker'
+require_relative './profile_definitions/<%=name.downcase%>_definitions'
+
+# require_relative '../uscore_v3.1.1/data_absent_reason_checker'
+# require_relative '../uscore_v3.1.1/profile_definitions/us_core_careplan_definitions'
+
+module Inferno
+  module Sequence
+    class <%=class_name%> < SequenceBase
+      <% index = 0 %>
+      <% happy_path.uniq.each do |fields| %>
+        <% index += 1 %>
+        <% fields_text = fields.keys[0].join('_') %>
+        <%= %(test "search_by_#{fields_text}_#{index}" do
+          metadata do
+            id 'search_by_#{fields_text}_cerner_#{index}'
+            name 'Server returns expected results from (#{name}) search by #{fields_text}'
+            link 'https://www.hl7.org/fhir/us/core/CapabilityStatement-us-core-server.html'
+            description %(A server SHOULD support searching by #{fields_text} on the #{name} resource)
+            versions :r4
+          end
+          skip 'No #{name} resources appear to be available. Please use patients with more information.' unless @resources_found
+          search_params = #{fields.values[0]}
+          search_params.each { |param, value| skip 'Could not resolve  in given resource' if value.nil? }
+          reply = get_resource_by_params(versioned_resource_class('#{name}'), search_params)
+          "validate_search_reply(versioned_resource_class('#{name}'), reply, search_params)"
+        end) %>
+      <% end  %>
+        <% unhappy_path.uniq.each do |fields| %>
+          <% index += 1 %>
+        <% fields_text = fields.keys[0].join('_') %>
+        <%= %(test "search_by_#{fields_text}_#{index}" do
+          metadata do
+            id 'search_by_#{fields_text}_cerner_#{index}'
+            name 'Server returns expected results from (#{name}) search by #{fields_text}'
+            link 'https://www.hl7.org/fhir/us/core/CapabilityStatement-us-core-server.html'
+            description %(A server SHOULD support searching by #{fields_text} on the #{name} resource)
+            versions :r4
+          end
+          skip 'No #{name} resources appear to be available. Please use patients with more information.' unless @resources_found
+          search_params = #{fields.values[0]}
+          search_params.each { |param, value| skip 'Could not resolve  in given resource' if value.nil? }
+          reply = get_resource_by_params(versioned_resource_class('#{name}'), search_params)
+          'assert_response_bad(reply)'
+        end) %>
+        <%end %>
+
+    end
+  end
+end

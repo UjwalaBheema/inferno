@@ -1,0 +1,81 @@
+resource: CareTeam
+name: 'cerner_us_core_careteam'
+class_name: 'USCore311CernerCareteamSequence'
+version: 'v3.1.1'
+reformatted_version: '311'
+test_id_prefix: 'USCCPL'
+profile: 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-careteam'
+profile_name: 'Cerner US Core CareTeam Profile'
+title: 'CareTeam'
+actions:
+  read:
+    parameters:
+      id:
+        type: id_token
+        occurrence: single
+        id_value_type: pattern
+        id_value_type_pattern: ^([a-zA-Z0-9\-\_]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+$)
+
+  search:
+    parameters:
+      ids:
+        type: id_token
+        display: '_id'
+        occurrence: single
+        id_value_type: pattern
+        id_value_type_pattern: ^([a-zA-Z0-9\-\_]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+$)
+
+      patient:
+        type: reference
+        display: 'patient'
+        occurrence: single
+        resource_type: 'Patient'
+        reference_value_type: millennium
+
+      encounter:
+        type: reference
+        display: 'encounter'
+        occurrence: single
+        resource_type: 'Encounter'
+        reference_value_type: millennium
+
+      categories:
+        type: token
+        display: 'category'
+        occurrence: single
+
+      status:
+        type: token
+        token_system: 'http://hl7.org/fhir/ValueSet/care-team-status|4.0.1'
+        display: 'status'
+        occurence: single
+
+    constraints:
+      - type: parameter_group
+        name: retrieve_by_ids
+        parameters: [ids]
+
+      - type: parameter_group
+        name: search_by_parameters
+        parameters: [patient, encounter, categories, status]
+
+      - type: cannot_be_set_together
+        parameters: [ids, patient, encounter]
+
+      - type: cannot_be_set_together
+        parameters: [encounter, categories]
+
+      - type: cannot_be_set_together
+        parameters: [ids, categories]
+
+      - type: cannot_be_set_together
+        parameters: [encounter, status]
+
+      - type: cannot_be_set_together
+        parameters: [encounter, ids]
+
+      - type: cannot_be_set_together
+        parameters: [patient, encounter]
+
+      - type: at_least_one_must_be_set
+        parameters: [ids, patient, encounter]

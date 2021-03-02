@@ -1,0 +1,85 @@
+resource: CarePlan
+name: 'cerner_us_core_careplan'
+class_name: 'USCore311CernerCareplanSequence'
+version: 'v3.1.1'
+reformatted_version: '311'
+test_id_prefix: 'USCCPL'
+profile: 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-careplan'
+profile_name: 'Cerner US Core CarePlan Profile'
+title: 'CarePlan'
+actions:
+  search:
+    parameters:
+      ids:
+        type: id_token
+        display: '_id'
+        occurrence: unbounded
+        id_value_type: millennium
+
+      patient:
+        type: 'reference'
+        display: 'patient'
+        resource_type: 'Patient'
+        reference_value_type: millennium
+
+      date:
+        type: date_range
+        display: 'date'
+        occurrence: exactly_two
+        date_range_multiple_values:
+          start_bounds:
+            - greater_or_equal
+          end_bounds:
+            - less_or_equal
+          time: must_be_provided_consistently
+
+      page_context:
+        type: string
+        display: '-pageContext'
+
+      page_direction:
+        type: string
+        display: '-pageDirection'
+
+      count:
+        type: number
+        display: '_count'
+        occurrence: single 
+        bounds: greater_than_zero
+      
+      category:
+        type: token
+        display: 'category'
+        occurrence: single
+
+    constraints:      
+      - type: parameter_group
+        name: retrieve_by_ids
+        parameters: [ids]
+
+      - type: parameter_group
+        name: search_by_parameters
+        parameters: [patient, date, count, category]
+      
+      - type: parameter_group
+        name: paging_params
+        parameters: [page_context, page_direction]
+      
+      - type: at_least_one_must_be_set
+        parameters: [ids, patient]
+
+      - type: must_be_set_together
+        parameters: [page_context, page_direction]
+
+      - type: groups_cannot_be_set_together
+        groups: [retrieve_by_ids, search_by_parameters]
+        
+      - type: groups_cannot_be_set_together
+        groups: [retrieve_by_ids, paging_params]
+
+  read:
+    parameters:
+      id:
+        type: id_token
+        occurrence: single
+        id_value_type: millennium

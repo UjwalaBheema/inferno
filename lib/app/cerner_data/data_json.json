@@ -1,0 +1,42 @@
+[
+  {
+    "CarePlan": {
+      "_id": "199230396",
+      "patient": "725944",
+      "date": 
+        ["ge2020-07-08T19:58:58.000Z",
+        "le2020-07-09T19:58:58.000Z"],
+      "_count": 10,
+      "category": "assess-plan"
+    }
+  },
+  
+  {
+    "CareTeam": {
+      "_id": "SA-119078440-34768489-96754416-0-0-0",
+      "patient": "119078440",
+      "encounter": "34768489",
+      "category": "longitudinal",
+      "status": "active"
+    }
+  },
+  
+  {"Goal":
+    {
+      "_id":"483537327",
+      "patient": "166045489",
+      "target-date": "gt2021-01-12"
+    }
+  },
+
+  {"Condition":
+    { 
+      "_id" : "p10126805",
+      "patient" : "1316024",
+      "category" : ["problem-list-item", "encounter-diagnosis", "health-concern"],
+      "clinical-status" : ["active","resolved"],
+      "_count" : 10
+
+    }
+  }
+]

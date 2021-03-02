@@ -1,0 +1,67 @@
+# Update this file to add more search criteria.
+resource: Goal
+name: 'cerner_us_core_goal'
+class_name: 'USCore311CernerGoalSequence'
+version: 'v3.1.1'
+reformatted_version: '311'
+test_id_prefix: 'USCCPL'
+profile: 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-goal'
+profile_name: 'Cerner US Core Goal Profile'
+title: 'CareTeam'
+actions:
+  search:
+    parameters:
+      ids:
+        type: id_token
+        display: '_id'
+        occurrence: unbounded
+        id_value_type: millennium
+
+      patient:
+        type: 'reference'
+        display: 'patient'
+        resource_type: 'Patient'
+        reference_value_type: millennium
+
+      dates:
+        type: date_range
+        display: 'target-date'
+        occurrence: one_to_two
+        date_range_single_value:
+          bounds:
+            - greater_than
+            - greater_or_equal
+            - less_than
+            - less_or_equal
+            - equal
+          time: cannot_be_provided
+        date_range_multiple_values:
+          start_bounds:
+            - greater_than
+            - greater_or_equal
+          end_bounds:
+            - less_than
+            - less_or_equal
+          time: cannot_be_provided_on_any
+
+    constraints:      
+      - type: parameter_group
+        name: retrieve_by_ids
+        parameters: [ids]
+
+      - type: parameter_group
+        name: search_by_parameters
+        parameters: [patient, dates]
+
+      - type: at_least_one_must_be_set
+        parameters: [ids, patient]
+
+      - type: groups_cannot_be_set_together
+        groups: [retrieve_by_ids, search_by_parameters]
+
+  read:
+    parameters:
+      id:
+        type: id_token
+        occurrence: single
+        id_value_type: millennium
